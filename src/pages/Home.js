@@ -44,19 +44,18 @@ const Home = () => {
   console.log("🟡 Component mounted - starting data load"); // Debug log A
   
   const getTodos = async () => {
-    try {
-      console.log("🟡 Calling fetchTodos()..."); // Debug log B
-      const data = await fetchTodos();
-      
-      console.log("🟢 Data received:", data); // Debug log C
-      setTodos(data);
-      
-    } catch (err) {
-      console.error("🔴 Failed to load todos:", err); // Debug log D
-    }
-  };
-
-  getTodos();
+  try {
+    const response = await fetchTodos();
+    console.log("API Response:", response);
+    
+    // Handle both array and object responses
+    const todosData = Array.isArray(response) ? response : response?.data || [];
+    setTodos(todosData);
+    
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
+};
 }, []);
 
   const filteredTodos = todos.filter(todo => {
