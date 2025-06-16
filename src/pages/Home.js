@@ -4,34 +4,32 @@ import { fetchTodos } from '../services/api';
 export default function Home() {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadTodos = async () => {
+    console.log('🟡 Component mounted - fetching data');
+    const loadData = async () => {
       try {
-        console.log('[DEBUG] Fetching todos...'); // Add this
+        console.log('🟡 Calling API...');
         const data = await fetchTodos();
-        console.log('[DEBUG] Received:', data); // Add this
+        console.log('🟢 API Response:', data);
         setTodos(data);
-      } catch (err) {
-        setError(err.message);
-        console.error('[DEBUG] Error:', err);
+      } catch (error) {
+        console.error('🔴 API Error:', error);
       } finally {
         setLoading(false);
       }
     };
-
-    loadTodos(); // Actually call the function
+    
+    loadData(); 
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div>Loading todos...</div>;
   if (!todos.length) return <div>No todos found</div>;
 
   return (
     <div>
-      <h1>Todos</h1>
-      <pre>{JSON.stringify(todos, null, 2)}</pre> {/* Temporary debug */}
+      <h1>Your Todos</h1>
+      <pre>{JSON.stringify(todos, null, 2)}</pre>
     </div>
   );
 }
