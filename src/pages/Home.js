@@ -13,21 +13,23 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState('');
+  const [error, setError] = useState(null);
 
   // Load paginated todos
   useEffect(() => {
     const loadTodos = async () => {
       setLoading(true);
+      setError(null);
       try {
-        // Fetch current page data
         const data = await fetchPaginatedTodos(currentPage);
         setTodos(data);
         
         // Get total count for pagination (mock API workaround)
         const allTodos = await fetchTodos();
         setTotalPages(Math.ceil(allTodos.length / 10));
-      } catch (error) {
-        console.error('Fetch failed:', error);
+      } catch (err) {
+        setError('Failed to load todos');
+        console.error('Fetch error:', err);
       } finally {
         setLoading(false);
       }
@@ -43,8 +45,9 @@ export default function Home() {
       const createdTodo = await createTodo(newTodo);
       setTodos(prev => [...prev, createdTodo]);
       setInput('');
-    } catch (error) {
-      console.error('Create failed:', error);
+    } catch (err) {
+      setError('Failed to add todo');
+      console.error('Create error:', err);
     }
   };
 
@@ -53,17 +56,26 @@ export default function Home() {
     try {
       await deleteTodo(id);
       setTodos(prev => prev.filter(todo => todo.id !== id));
-    } catch (error) {
-      console.error('Delete failed:', error);
+    } catch (err) {
+      setError('Failed to delete todo');
+      console.error('Delete error:', err);
     }
   };
 
   if (loading) return <div className="loading">Loading todos...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="home-container">
       <h1>Todo List</h1>
       
+      {/* Test Error Boundary Link */}
+      <nav>
+        <Link to="/test-error" className="test-error-link">
+          Test Error Boundary
+        </Link>
+      </nav>
+
       {/* Add Todo Form */}
       <div className="todo-form">
         <input
@@ -101,23 +113,25 @@ export default function Home() {
       </ul>
 
       {/* Pagination Controls */}
-      <div className="pagination">
-        <button 
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(prev => prev - 1)}
-        >
-          Previous
-        </button>
-        
-        <span>Page {currentPage} of {totalPages}</span>
-        
-        <button 
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(prev => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(prev => prev - 1)}
+          >
+            Previous
+          </button>
+          
+          <span>Page {currentPage} of {totalPages}</span>
+          
+          <button 
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(prev => prev + 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
