@@ -9,9 +9,9 @@ const api = axios.create({
   }
 });
 
-// Debug all requests
+// Debugging wrapper
 const request = async (method, endpoint, data = null) => {
-  console.log(`[API] ${method.toUpperCase()} ${endpoint}`);
+  console.log(`[API] ${method.toUpperCase()} ${endpoint}`, data || '');
   try {
     const response = await api({ method, url: endpoint, data });
     console.log('[API] Success:', response.data);
@@ -22,8 +22,13 @@ const request = async (method, endpoint, data = null) => {
   }
 };
 
-// CRUD Operations
-export const fetchTodos = () => request('get', '/todos?_limit=5');
+// CRUD + Pagination
+export const fetchTodos = () => request('get', '/todos');
+export const fetchTodo = (id) => request('get', `/todos/${id}`);
+export const fetchPaginatedTodos = (page = 1, limit = 10) => {
+  const start = (page - 1) * limit;
+  return request('get', `/todos?_start=${start}&_limit=${limit}`);
+};
 export const createTodo = (todo) => request('post', '/todos', todo);
 export const updateTodo = (id, todo) => request('put', `/todos/${id}`, todo);
 export const deleteTodo = (id) => request('delete', `/todos/${id}`);

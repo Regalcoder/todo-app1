@@ -1,33 +1,25 @@
 /* Base Styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 20px;
+  background-color: #f5f5f5;
 }
 
-.todo-container {
-  max-width: 600px;
+/* Home Page */
+.home-container {
+  max-width: 800px;
   margin: 0 auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .todo-form {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
-}
-
-.todo-form input {
-  flex: 1;
-  padding: 8px;
-  font-size: 16px;
-}
-
-.todo-form button {
-  padding: 8px 16px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
 }
 
 .todo-list {
@@ -39,24 +31,83 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 12px;
   border-bottom: 1px solid #eee;
 }
 
-.delete-btn {
-  background: #f44336;
+.todo-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+}
+
+.todo-title.completed {
+  text-decoration: line-through;
+  color: #888;
+}
+
+/* Detail Page */
+.detail-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.back-button {
+  background: #6c757d;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.todo-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.metadata {
+  margin-top: 20px;
+}
+
+.metadata p {
+  margin: 8px 0;
+}
+
+.completed {
+  color: #28a745;
+}
+
+.pending {
+  color: #ffc107;
+}
+
+/* Shared Components */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.loading, .error {
-  text-align: center;
-  padding: 20px;
-  font-size: 18px;
-}
-
-.error {
-  color: #f44336;
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
 }

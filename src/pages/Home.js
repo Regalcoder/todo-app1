@@ -1,39 +1,50 @@
 import { useState, useEffect } from 'react';
-import { fetchTodos, createTodo, deleteTodo } from '../services/api';
+import { Link } from 'react-router-dom';
+import { 
+  fetchTodos,
+  fetchPaginatedTodos,
+  createTodo,
+  deleteTodo
+} from '../services/api';
 
 export default function Home() {
   const [todos, setTodos] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Load initial data
+  // Load paginated todos
   useEffect(() => {
     const loadTodos = async () => {
+      setLoading(true);
       try {
-        const data = await fetchTodos();
+        // Fetch current page data
+        const data = await fetchPaginatedTodos(currentPage);
         setTodos(data);
-      } catch (err) {
-        setError('Failed to load todos');
-        console.error(err);
+        
+        // Get total count for pagination (mock API workaround)
+        const allTodos = await fetchTodos();
+        setTotalPages(Math.ceil(allTodos.length / 10));
+      } catch (error) {
+        console.error('Fetch failed:', error);
       } finally {
         setLoading(false);
       }
     };
     loadTodos();
-  }, []);
+  }, [currentPage]);
 
-  // Add new todo
-  const handleAdd = async () => {
+  // Create new todo
+  const handleCreate = async () => {
     if (!input.trim()) return;
     try {
       const newTodo = { title: input, completed: false };
       const createdTodo = await createTodo(newTodo);
       setTodos(prev => [...prev, createdTodo]);
       setInput('');
-    } catch (err) {
-      setError('Failed to add todo');
-      console.error(err);
+    } catch (error) {
+      console.error('Create failed:', error);
     }
   };
 
@@ -42,34 +53,45 @@ export default function Home() {
     try {
       await deleteTodo(id);
       setTodos(prev => prev.filter(todo => todo.id !== id));
-    } catch (err) {
-      setError('Failed to delete todo');
-      console.error(err);
+    } catch (error) {
+      console.error('Delete failed:', error);
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) return <div className="loading">Loading todos...</div>;
 
   return (
-    <div className="todo-container">
-      <h1>Todo App</h1>
+    <div className="home-container">
+      <h1>Todo List</h1>
       
+      {/* Add Todo Form */}
       <div className="todo-form">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="What needs to be done?"
+          onKeyPress={(e) => e.key === 'Enter' && handleCreate()}
         />
-        <button onClick={handleAdd}>Add</button>
+        <button onClick={handleCreate}>Add Todo</button>
       </div>
 
+      {/* Todo List */}
       <ul className="todo-list">
         {todos.map(todo => (
           <li key={todo.id}>
-            {todo.title}
+            <Link to={`/todos/${todo.id}`} className="todo-link">
+              <span className={`todo-title ${todo.completed ? 'completed' : ''}`}>
+                {todo.title}
+              </span>
+              <span className="todo-status">
+                {todo.completed ? '✅ Completed' : '🟡 Pending'}
+              </span>
+            </Link>
             <button 
-              onClick={() => handleDelete(todo.id)}
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete(todo.id);
+              }}
               className="delete-btn"
             >
               Delete
@@ -77,6 +99,25 @@ export default function Home() {
           </li>
         ))}
       </ul>
+
+      {/* Pagination Controls */}
+      <div className="pagination">
+        <button 
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(prev => prev - 1)}
+        >
+          Previous
+        </button>
+        
+        <span>Page {currentPage} of {totalPages}</span>
+        
+        <button 
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(prev => prev + 1)}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
