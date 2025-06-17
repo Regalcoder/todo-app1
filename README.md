@@ -1,70 +1,171 @@
-# Getting Started with Create React App
+# Todo Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A feature-rich todo application built with React, React Router, and Axios, featuring CRUD operations, search/filter capabilities, and responsive design.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Full CRUD Operations**: Create, Read, Update, and Delete todos
+- **Pagination**: Browse todos with 10 items per page
+- **Search & Filter**:
+  - Real-time search by title
+  - Filter by completion status (All/Completed/Incomplete)
+- **Error Handling**:
+  - Custom error boundary
+  - 404 page for undefined routes
+- **Responsive Design**: Works on mobile, tablet, and desktop
+- **UI Features**:
+  - Loading states
+  - Skeleton loaders
+  - Status toggling
+  - Toast notifications
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Prerequisites
+- Node.js (v16+ recommended)
+- npm or yarn
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/todo-app.git
+   cd todo-app
+Install dependencies:
 
-### `npm test`
+bash
+npm install
+Start the development server:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+bash
+npm start
+Open http://localhost:3000 in your browser.
 
-### `npm run build`
+Available Scripts
+npm start: Runs the app in development mode
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+npm test: Launches the test runner
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+npm run build: Builds the app for production
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+npm run eject: Ejects from Create React App (irreversible)
 
-### `npm run eject`
+Technology Stack
+Frontend
+React 18: Component-based architecture
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+React Router v6: Client-side routing
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Axios: HTTP client for API requests
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+React Icons: SVG icons
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+CSS Modules: Component-scoped styling
 
-## Learn More
+Backend (Mock API)
+JSONPlaceholder: Free fake API for testing
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+LocalForage: Client-side caching
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Architecture Decisions
+Functional Components: With React hooks
 
-### Code Splitting
+Container/Presentational Pattern: Separates logic and UI
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Responsive-First Design: Mobile-optimized UI
 
-### Analyzing the Bundle Size
+Error Boundary: Catches component tree errors
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+API Documentation
+The app uses these endpoints from JSONPlaceholder:
 
-### Making a Progressive Web App
+Endpoint	Method	Description
+/todos	GET	Fetch all todos
+/todos/:id	GET	Fetch single todo
+/todos	POST	Create new todo
+/todos/:id	PUT	Update todo
+/todos/:id	DELETE	Delete todo
+Pagination Parameters:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+?_start=0&_limit=10 - Gets first 10 todos
 
-### Advanced Configuration
+Screenshots & Demos
+Key Features
+Feature	Screenshot
+Todo List	https://./screenshots/list-view.png
+Todo Detail	https://./screenshots/detail-view.png
+Mobile View	https://./screenshots/mobile-view.png
+Error Boundary	https://./screenshots/error-view.png
+View full demo video
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Known Issues
+API Limitations:
 
-### Deployment
+JSONPlaceholder doesn't persist changes
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Pagination requires fetching all todos first
 
-### `npm run build` fails to minify
+Performance:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Large todo lists may impact rendering
+
+No debounce on search input
+
+Browser Support:
+
+Limited testing on legacy browsers
+
+Future Improvements
+Enhanced Features:
+
+Due dates and priority levels
+
+Drag-and-drop reordering
+
+Tags and categories
+
+Technical Improvements:
+
+Implement Redux for state management
+
+Add proper backend with user authentication
+
+Implement service workers for offline support
+
+UX Improvements:
+
+Undo/redo functionality
+
+Bulk operations
+
+Dark mode toggle
+
+Contributing
+Contributions are welcome! Please follow these steps:
+
+Fork the repository
+
+Create a feature branch (git checkout -b feature/AmazingFeature)
+
+Commit your changes (git commit -m 'Add some AmazingFeature')
+
+Push to the branch (git push origin feature/AmazingFeature)
+
+Open a Pull Request
+
+text
+
+### Recommended File Structure for Assets:
+project-root/
+├── public/
+├── src/
+├── screenshots/
+│ ├── list-view.png
+│ ├── detail-view.png
+│ ├── mobile-view.png
+│ └── error-view.png
+├── demos/
+│ └── app-demo.mp4
+├── README.md
+└── LICENSE
+
+text
