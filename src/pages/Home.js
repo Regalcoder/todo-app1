@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   fetchTodos,
@@ -8,13 +8,16 @@ import {
 } from '../services/api';
 
 export default function Home() {
-  const [todos, setTodos] = useState([]);
+  const [allTodos, setAllTodos] = useState([]);
+  const [displayedTodos, setDisplayedTodos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(null);
   const [input, setInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'completed', 'incomplete'
 
   // Load paginated todos
   useEffect(() => {
@@ -22,7 +25,7 @@ export default function Home() {
       setIsLoading(true);
       try {
         const data = await fetchPaginatedTodos(currentPage);
-        setTodos(data);
+        setAllTodos(data);
         
         // Get total count for pagination
         const allTodos = await fetchTodos();
@@ -36,6 +39,20 @@ export default function Home() {
     loadTodos();
   }, [currentPage]);
 
+  // Filter todos based on search and status
+  useEffect(() => {
+    const filtered = allTodos.filter(todo => {
+      const matchesSearch = todo.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = 
+        statusFilter === 'all' || 
+        (statusFilter === 'completed' && todo.completed) || 
+        (statusFilter === 'incomplete' && !todo.completed);
+      
+      return matchesSearch && matchesStatus;
+    });
+    setDisplayedTodos(filtered);
+  }, [allTodos, searchTerm, statusFilter]);
+
   // Create new todo
   const handleCreate = async () => {
     if (!input.trim()) return;
@@ -43,7 +60,7 @@ export default function Home() {
     try {
       const newTodo = { title: input, completed: false };
       const createdTodo = await createTodo(newTodo);
-      setTodos(prev => [createdTodo, ...prev]);
+      setAllTodos(prev => [createdTodo, ...prev]);
       setInput('');
     } catch (error) {
       console.error('Create failed:', error);
@@ -57,7 +74,7 @@ export default function Home() {
     setIsDeleting(id);
     try {
       await deleteTodo(id);
-      setTodos(prev => prev.filter(todo => todo.id !== id));
+      setAllTodos(prev => prev.filter(todo => todo.id !== id));
     } catch (error) {
       console.error('Delete failed:', error);
     } finally {
@@ -65,7 +82,19 @@ export default function Home() {
     }
   };
 
-  // Skeleton loader for todos
+  // Toggle todo status
+  const handleToggleStatus = async (id) => {
+    try {
+      const todoToUpdate = allTodos.find(todo => todo.id === id);
+      const updatedTodo = { ...todoToUpdate, completed: !todoToUpdate.completed };
+      await updatedTodo(id, updatedTodo);
+      setAllTodos(prev => prev.map(todo => todo.id === id ? updatedTodo : todo));
+    } catch (error) {
+      console.error('Update failed:', error);
+    }
+  };
+
+  // Skeleton loader
   const renderSkeletons = () => {
     return Array(5).fill(0).map((_, index) => (
       <li key={`skeleton-${index}`} className="todo-item">
@@ -84,6 +113,49 @@ export default function Home() {
           Test Error Boundary
         </Link>
       </header>
+
+      {/* Search and Filter Controls */}
+      <div className="controls">
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search todos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <span className="search-icon">🔍</span>
+        </div>
+        
+        <div className="filter-controls">
+          <label>
+            <input
+              type="radio"
+              name="status"
+              checked={statusFilter === 'all'}
+              onChange={() => setStatusFilter('all')}
+            />
+            All
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="status"
+              checked={statusFilter === 'completed'}
+              onChange={() => setStatusFilter('completed')}
+            />
+            Completed
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="status"
+              checked={statusFilter === 'incomplete'}
+              onChange={() => setStatusFilter('incomplete')}
+            />
+            Incomplete
+          </label>
+        </div>
+      </div>
 
       {/* Add Todo Form */}
       <div className="todo-form">
@@ -105,16 +177,21 @@ export default function Home() {
       {/* Todo List */}
       <ul className="todo-list">
         {isLoading && renderSkeletons()}
-        {!isLoading && todos.map(todo => (
+        {!isLoading && displayedTodos.map(todo => (
           <li key={todo.id} className="todo-item">
-            <Link to={`/todos/${todo.id}`} className="todo-content">
-              <span className={`todo-title ${todo.completed ? 'completed' : ''}`}>
-                {todo.title}
-              </span>
-              <span className="todo-status">
-                {todo.completed ? 'Completed' : 'Pending'}
-              </span>
-            </Link>
+            <div className="todo-content">
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => handleToggleStatus(todo.id)}
+                className="status-checkbox"
+              />
+              <Link to={`/todos/${todo.id}`} className="todo-link">
+                <span className={`todo-title ${todo.completed ? 'completed' : ''}`}>
+                  {todo.title}
+                </span>
+              </Link>
+            </div>
             <div className="todo-actions">
               <button 
                 onClick={(e) => {
@@ -128,6 +205,9 @@ export default function Home() {
             </div>
           </li>
         ))}
+        {!isLoading && displayedTodos.length === 0 && (
+          <li className="no-results">No todos found matching your criteria</li>
+        )}
       </ul>
 
       {/* Pagination Controls */}
@@ -151,7 +231,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Full-page loading overlay */}
+      {/* Loading overlay */}
       {(isLoading && currentPage === 1) && (
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
